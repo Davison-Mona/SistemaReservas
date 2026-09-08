@@ -1,0 +1,31 @@
+@model IEnumerable<SistemaReservas.Models.Negocio>
+
+@{
+    ViewData["Title"] = "Listado de Negocios";
+}
+
+<div class="container mt-4">
+    <h2>Listado de Negocios</h2>
+
+    <table class="table table-striped mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Correo</th>
+                <th>Teléfono</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.Nombre</td>
+                    <td>@item.Correo</td>
+                    <td>@item.Telefono</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
