@@ -1,0 +1,212 @@
+@{
+    ViewData["Title"] = "Olvidé mi contraseña";
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+<div class="login-wrapper">
+    <!-- Formas orgánicas de fondo -->
+    <div class="shape wave-top-left"></div>
+    <div class="shape wave-bottom-right"></div>
+
+    <!-- Marca de agua de fondo -->
+    <div class="watermark-calendar d-none d-lg-block">
+        <i class="bi bi-shield-lock"></i>
+    </div>
+
+    <div class="container position-relative z-2">
+        <div class="row align-items-center justify-content-center min-vh-100 py-4">
+            
+            <!-- Texto descriptivo lado izquierdo -->
+            <div class="col-lg-4 d-none d-lg-block pe-lg-4">
+                <div class="mb-3 text-navy">
+                    <i class="bi bi-key fs-1"></i>
+                </div>
+                <h3 class="fw-semibold text-navy lh-base mb-3">
+                    ¿Olvidaste tu acceso?<br />Te ayudamos a recuperarlo.
+                </h3>
+                <div class="accent-bar"></div>
+            </div>
+
+            <!-- Tarjeta Principal de Recuperación -->
+            <div class="col-12 col-sm-10 col-md-8 col-lg-5 col-xl-4 ms-lg-4">
+                <div class="card login-card border-0 shadow-lg">
+                    <div class="card-body p-4 p-sm-5 text-center">
+                        
+                        <!-- Header del Logo -->
+                        <div class="mb-4">
+                            <div class="logo-icon-box mx-auto mb-2">
+                                <i class="bi bi-envelope-at-fill text-white fs-3"></i>
+                            </div>
+                            <h2 class="fw-bold text-navy mb-0">Recuperación</h2>
+                            <p class="text-uppercase tracking-wider text-muted small fw-bold mb-0">SISTEMA DE RESERVAS</p>
+                        </div>
+
+                        <!-- Título Formulario -->
+                        <div class="text-start mb-4">
+                            <h5 class="fw-bold text-dark mb-1">Restablecer clave</h5>
+                            <p class="text-muted small mb-0">Ingresa tu correo registrado para enviarte las instrucciones.</p>
+                        </div>
+
+                        @if (ViewBag.Error != null)
+                        {
+                            <div class="alert alert-danger py-2 small text-start mb-3">
+                                <i class="bi bi-exclamation-triangle-fill me-1"></i> @ViewBag.Error
+                            </div>
+                        }
+
+                        @if (ViewBag.Exito != null)
+                        {
+                            <div class="alert alert-success py-2 small text-start mb-3">
+                                <i class="bi bi-check-circle-fill me-1"></i> @ViewBag.Exito
+                            </div>
+                        }
+
+                        <!-- Formulario de Correo -->
+                        <form asp-action="OlvideContrasena" method="post" class="text-start">
+                            <div class="mb-4">
+                                <label class="form-label small fw-semibold text-secondary mb-1">Correo Electrónico</label>
+                                <div class="input-group custom-input-group">
+                                    <span class="input-group-text bg-white text-muted border-end-0">
+                                        <i class="bi bi-envelope"></i>
+                                    </span>
+                                    <input type="email" name="correo" class="form-control border-start-0 ps-0" placeholder="ejemplo@correo.com" required />
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-navy w-100 py-2.5 fw-semibold d-flex align-items-center justify-content-center gap-2">
+                                <span>Enviar Enlace</span>
+                                <i class="bi bi-send"></i>
+                            </button>
+                        </form>
+
+                        <div class="mt-4">
+                            <a asp-action="Index" class="text-decoration-none text-primary-link small fw-semibold">
+                                <i class="bi bi-arrow-left me-1"></i> Volver al inicio de sesión
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --color-navy: #192a3e;
+        --color-navy-hover: #111d2c;
+        --bg-color: #f3f5f8;
+        --link-color: #7b9bb4;
+    }
+
+    body {
+        background-color: var(--bg-color) !important;
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        overflow-x: hidden;
+    }
+
+    .login-wrapper {
+        min-height: 100vh;
+        position: relative;
+    }
+
+    .text-navy {
+        color: var(--color-navy);
+    }
+
+    .shape {
+        position: absolute;
+        border-radius: 50%;
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    .wave-top-left {
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(circle, #2d4356 0%, #192a3e 100%);
+        top: -200px;
+        left: -200px;
+        border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+    }
+
+    .wave-bottom-right {
+        width: 600px;
+        height: 600px;
+        background: linear-gradient(135deg, #a2b9bc 0%, #b2c8d6 100%);
+        bottom: -250px;
+        right: -200px;
+        border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+        opacity: 0.7;
+    }
+
+    .watermark-calendar {
+        position: absolute;
+        right: 8%;
+        top: 25%;
+        font-size: 20rem;
+        color: rgba(180, 200, 215, 0.25);
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    .login-card {
+        border-radius: 20px !important;
+        background: #ffffff;
+    }
+
+    .logo-icon-box {
+        width: 60px;
+        height: 60px;
+        background-color: var(--color-navy);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 16px rgba(25, 42, 62, 0.2);
+    }
+
+    .tracking-wider {
+        letter-spacing: 1.5px;
+        font-size: 0.75rem;
+    }
+
+    .custom-input-group .form-control,
+    .custom-input-group .input-group-text {
+        border-color: #dee2e6;
+        padding-top: 0.65rem;
+        padding-bottom: 0.65rem;
+    }
+
+    .custom-input-group .form-control:focus {
+        box-shadow: none;
+        border-color: #dee2e6;
+    }
+
+    .btn-navy {
+        background-color: var(--color-navy);
+        color: #ffffff;
+        border-radius: 10px;
+        border: none;
+        transition: all 0.2s ease;
+    }
+
+    .btn-navy:hover {
+        background-color: var(--color-navy-hover);
+        color: #ffffff;
+    }
+
+    .text-primary-link {
+        color: var(--link-color);
+    }
+
+    .accent-bar {
+        width: 40px;
+        height: 3px;
+        background-color: var(--link-color);
+        border-radius: 2px;
+    }
+</style>
