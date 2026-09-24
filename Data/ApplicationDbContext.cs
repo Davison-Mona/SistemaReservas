@@ -12,16 +12,15 @@ namespace SistemaReservas.Data
         {
         }
 
-        
         public DbSet<Negocio> Negocios { get; set; }
         public DbSet<Usuario> Usuarios { get; set; }
+        public DbSet<Servicio> Servicios { get; set; }
+        public DbSet<HorarioAtencion> HorariosAtencion { get; set; }
+        public DbSet<DiaBloqueado> DiasBloqueados { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            
             base.OnModelCreating(modelBuilder);
-
-            
         }
     }
 }

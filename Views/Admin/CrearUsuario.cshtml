@@ -1,0 +1,31 @@
+@model SistemaReservas.Models.CrearUsuarioViewModel
+
+<div class="container mt-4" style="max-width: 500px;">
+    <h2>Crear Usuario</h2>
+    <form asp-action="CrearUsuario" method="post">
+        <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+        <div class="mb-3">
+            <label class="form-label">Correo Electrónico</label>
+            <input asp-for="Email" class="form-control" placeholder="ejemplo@correo.com" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Contraseña Asignada</label>
+            <input asp-for="Password" class="form-control" type="password" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Rol del Usuario</label>
+            <select asp-for="Rol" class="form-select">
+                <option value="">-- Seleccionar Rol --</option>
+                <option value="Admin">Administrador</option>
+                <option value="Cliente">Cliente</option>
+                <option value="Negocio">Dueño de Negocio</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-success w-100">Guardar Usuario</button>
+        <a asp-action="Usuarios" class="btn btn-secondary w-100 mt-2">Cancelar</a>
+    </form>
+</div>

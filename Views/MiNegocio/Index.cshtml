@@ -1,0 +1,145 @@
+@model SistemaReservas.Models.Negocio
+
+@{
+    ViewData["Title"] = "Administrar Mi Negocio";
+}
+
+<div class="container my-4">
+    @if (TempData["Exito"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>@TempData["Exito"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- 🔗 Tarjeta de Enlace Personalizado -->
+    <div class="card shadow-sm border-0 mb-4 bg-primary bg-gradient text-white">
+        <div class="card-body p-4">
+            <h5 class="fw-bold"><i class="bi bi-link-45deg me-2"></i>Tu Enlace Exclusivo para Clientes</h5>
+            <p class="small mb-2 opacity-75">Comparte este enlace por WhatsApp o Redes Sociales para que tus clientes entren directamente a tu agenda:</p>
+            <div class="input-group">
+                <input type="text" id="inputEnlace" class="form-control fw-bold text-dark" readonly 
+                       value="@($"{Context.Request.Scheme}://{Context.Request.Host}/agendar/{Model.Slug}")" />
+                <button class="btn btn-dark" onclick="copiarLink()">
+                    <i class="bi bi-clipboard me-1"></i> Copiar Enlace
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🏬 Nombre del Negocio -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body p-4">
+            <h5 class="fw-bold text-dark mb-3"><i class="bi bi-shop me-2"></i>Información Comercial</h5>
+            <form asp-action="ActualizarNombre" method="post" class="row g-2">
+                <input type="hidden" name="id" value="@Model.Id" />
+                <div class="col-md-9">
+                    <label class="form-label text-muted small fw-semibold">Nombre del Negocio</label>
+                    <input type="text" name="nombre" value="@Model.Nombre" class="form-control" required />
+                </div>
+                <div class="col-md-3 align-self-end">
+                    <button type="submit" class="btn btn-primary w-100">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- ✂️ SERVICIOS Y PRECIOS -->
+        <div class="col-lg-7">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold text-dark mb-3"><i class="bi bi-journal-check me-2"></i>Servicios y Precios</h5>
+
+                    <form asp-action="AgregarServicio" method="post" class="bg-light p-3 rounded mb-3">
+                        <input type="hidden" name="negocioId" value="@Model.Id" />
+                        <div class="row g-2">
+                            <div class="col-md-5">
+                                <input type="text" name="nombre" class="form-control form-control-sm" placeholder="Ej: Corte clásico" required />
+                            </div>
+                            <div class="col-md-4">
+                                <input type="number" name="precio" class="form-control form-control-sm" placeholder="Precio ($)" step="500" required />
+                            </div>
+                            <div class="col-md-3">
+                                <button type="submit" class="btn btn-success btn-sm w-100">+ Agregar</button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Servicio</th>
+                                    <th>Precio</th>
+                                    <th class="text-end">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var s in Model.Servicios)
+                                {
+                                    <tr>
+                                        <td class="fw-bold">@s.Nombre</td>
+                                        <td>$@s.Precio.ToString("N0")</td>
+                                        <td class="text-end">
+                                            <form asp-action="EliminarServicio" asp-route-id="@s.Id" method="post" class="d-inline">
+                                                <button type="submit" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🚫 INHABILITAR DÍAS POR IMPREVISTOS -->
+        <div class="col-lg-5">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold text-dark mb-3"><i class="bi bi-calendar-x me-2"></i>Inhabilitar Días</h5>
+                    <p class="text-muted small">Inhabilita una fecha si por emergencias o descanso no podrás atender citas.</p>
+
+                    <form asp-action="BloquearDia" method="post" class="bg-light p-3 rounded mb-3">
+                        <input type="hidden" name="negocioId" value="@Model.Id" />
+                        <div class="mb-2">
+                            <input type="date" name="fecha" class="form-control form-control-sm" min="@DateTime.Now.ToString("yyyy-MM-dd")" required />
+                        </div>
+                        <div class="mb-2">
+                            <input type="text" name="motivo" class="form-control form-control-sm" placeholder="Motivo (ej. Capacitación, Calamidad)" required />
+                        </div>
+                        <button type="submit" class="btn btn-danger btn-sm w-100">Bloquear Fecha</button>
+                    </form>
+
+                    <h6 class="fw-bold text-secondary">Fechas Inhabilitadas:</h6>
+                    <ul class="list-group list-group-flush">
+                        @foreach (var d in Model.DiasBloqueados.Where(x => x.Fecha >= DateTime.Today))
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <div>
+                                    <span class="fw-bold text-danger">@d.Fecha.ToString("dd/MM/yyyy")</span>
+                                    <small class="text-muted d-block">@d.Motivo</small>
+                                </div>
+                                <form asp-action="DesbloquearDia" asp-route-id="@d.Id" method="post">
+                                    <button type="submit" class="btn btn-outline-success btn-sm"><i class="bi bi-unlock"></i> Habilitar</button>
+                                </form>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function copiarLink() {
+        var input = document.getElementById("inputEnlace");
+        input.select();
+        navigator.clipboard.writeText(input.value);
+        alert("¡Enlace copiado al portapapeles!");
+    }
+</script>

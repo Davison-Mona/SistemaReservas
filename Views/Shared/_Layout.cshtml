@@ -26,6 +26,20 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
+
+                        <!-- Menú exclusivo para Administradores -->
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-primary fw-bold" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    ⚙️ Panel Admin
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                                    <li><a class="dropdown-item" asp-controller="Admin" asp-action="Usuarios">Gestión Usuarios</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Admin" asp-action="Negocios">Gestión Negocios</a></li>
+                                </ul>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>

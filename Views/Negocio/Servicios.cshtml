@@ -1,0 +1,165 @@
+@model SistemaReservas.Models.Negocio
+
+@{
+    ViewData["Title"] = "Gestión de Servicios";
+}
+
+<!-- Estilos inspirados en el diseño de referencia -->
+<style>
+    .beunik-bg { background-color: #f0f7ff; }
+    .beunik-title { color: #1e81b0; font-weight: 700; }
+    .beunik-card { 
+        border-radius: 15px; 
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .beunik-card:hover { 
+        transform: translateY(-3px); 
+        box-shadow: 0 8px 15px rgba(0,0,0,0.05); 
+    }
+    .beunik-price { color: #1e3a8a; font-weight: 800; }
+    .beunik-time { color: #5c7c99; font-size: 0.9rem; }
+    .beunik-icon-circle {
+        width: 70px; height: 70px;
+        background-color: #3498db;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto;
+        color: white; font-size: 2rem;
+    }
+</style>
+
+<div class="container my-5 max-w-4xl mx-auto">
+    
+    @if (TempData["Exito"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm text-center">
+            @TempData["Exito"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Encabezado estilo Beunik -->
+    <div class="text-center mb-5">
+        <div class="beunik-icon-circle mb-3 shadow">
+            <i class="bi bi-scissors"></i> <!-- Puedes cambiarlo por un diente para odontología -->
+        </div>
+        <h2 class="beunik-title mb-1">Tus Servicios</h2>
+        <p class="text-muted">Gestiona lo que ofreces a tus clientes</p>
+        
+        <button class="btn btn-outline-primary rounded-pill px-4 fw-bold mt-2" data-bs-toggle="modal" data-bs-target="#modalServicio">
+            + Añadir Nuevo Servicio
+        </button>
+    </div>
+
+    <!-- Grilla de Tarjetas de Servicio -->
+    <div class="row g-4 justify-content-center">
+        @if (!Model.Servicios.Any())
+        {
+            <div class="text-center text-muted py-5">
+                <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+                <p>No tienes servicios registrados. ¡Añade el primero!</p>
+            </div>
+        }
+        else
+        {
+            @foreach (var servicio in Model.Servicios)
+            {
+                <div class="col-md-6 col-lg-5">
+                    <!-- Tarjeta con fondo azul claro y bordes suaves -->
+                    <div class="beunik-card beunik-bg p-4 h-100 d-flex flex-column position-relative border-0">
+                        
+                        <!-- Botones de administración (Solo los ve el dueño) -->
+                        <div class="position-absolute top-0 end-0 p-2">
+                            <button class="btn btn-sm btn-link text-secondary p-1" onclick="editarServicio(@servicio.Id, '@servicio.Nombre', @servicio.Precio.ToString("0"), @servicio.DuracionMinutos)" title="Editar">
+                                <i class="bi bi-pencil-square fs-5"></i>
+                            </button>
+                            <form asp-action="EliminarServicio" method="post" class="d-inline" onsubmit="return confirm('¿Seguro que deseas eliminar este servicio?');">
+                                <input type="hidden" name="id" value="@servicio.Id" />
+                                <button type="submit" class="btn btn-sm btn-link text-danger p-1" title="Eliminar">
+                                    <i class="bi bi-trash fs-5"></i>
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Contenido visible también para clientes -->
+                        <h5 class="beunik-title mb-4 pe-5">@servicio.Nombre</h5>
+                        
+                        <div class="d-flex justify-content-between align-items-end mt-auto pt-2">
+                            <span class="beunik-time">
+                                <i class="bi bi-clock me-1"></i> @servicio.DuracionMinutos minutos
+                            </span>
+                            <span class="beunik-price fs-5">
+                                $ @servicio.Precio.ToString("N0")
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+<!-- Modal para Crear/Editar Servicio -->
+<div class="modal fade" id="modalServicio" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title beunik-title" id="modalTitulo">Añadir Servicio</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="GuardarServicio" method="post">
+                <div class="modal-body p-4">
+                    <input type="hidden" name="id" id="servicioId" value="" />
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-muted small">Nombre del Servicio</label>
+                        <input type="text" name="nombre" id="servicioNombre" class="form-control form-control-lg rounded-3 bg-light" placeholder="Ej: Cita odontológica" required />
+                    </div>
+                    
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label class="form-label fw-bold text-muted small">Duración (minutos)</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-clock"></i></span>
+                                <input type="number" name="duracionMinutos" id="servicioDuracion" class="form-control bg-light border-start-0" placeholder="Ej: 40" required min="5" />
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-bold text-muted small">Precio ($)</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0">$</span>
+                                <input type="number" name="precio" id="servicioPrecio" class="form-control bg-light border-start-0" placeholder="Ej: 150000" required min="0" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 pt-0 pb-4 px-4">
+                    <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 fw-bold">Guardar Servicio</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Script para pasar los datos al modal cuando se hace clic en Editar -->
+<script>
+    function editarServicio(id, nombre, precio, duracion) {
+        document.getElementById('modalTitulo').innerText = 'Editar Servicio';
+        document.getElementById('servicioId').value = id;
+        document.getElementById('servicioNombre').value = nombre;
+        document.getElementById('servicioPrecio').value = precio;
+        document.getElementById('servicioDuracion').value = duracion;
+        
+        var myModal = new bootstrap.Modal(document.getElementById('modalServicio'));
+        myModal.show();
+    }
+
+    // Limpiar el modal cuando se cierra para que sirva al crear uno nuevo
+    document.getElementById('modalServicio').addEventListener('hidden.bs.modal', function () {
+        document.getElementById('modalTitulo').innerText = 'Añadir Servicio';
+        document.getElementById('servicioId').value = '';
+        document.getElementById('servicioNombre').value = '';
+        document.getElementById('servicioPrecio').value = '';
+        document.getElementById('servicioDuracion').value = '';
+    });
+</script>

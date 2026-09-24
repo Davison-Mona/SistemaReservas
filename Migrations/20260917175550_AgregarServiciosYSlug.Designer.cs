@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SistemaReservas.Data;
 
@@ -11,9 +12,11 @@ using SistemaReservas.Data;
 namespace SistemaReservas.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260917175550_AgregarServiciosYSlug")]
+    partial class AgregarServiciosYSlug
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -246,7 +249,7 @@ namespace SistemaReservas.Migrations
 
                     b.HasIndex("NegocioId");
 
-                    b.ToTable("DiasBloqueados", (string)null);
+                    b.ToTable("DiasBloqueados");
                 });
 
             modelBuilder.Entity("SistemaReservas.Models.HorarioAtencion", b =>
@@ -276,7 +279,7 @@ namespace SistemaReservas.Migrations
 
                     b.HasIndex("NegocioId");
 
-                    b.ToTable("HorariosAtencion", (string)null);
+                    b.ToTable("HorariosAtencion");
                 });
 
             modelBuilder.Entity("SistemaReservas.Models.Negocio", b =>
@@ -310,7 +313,7 @@ namespace SistemaReservas.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Negocios", (string)null);
+                    b.ToTable("Negocios");
                 });
 
             modelBuilder.Entity("SistemaReservas.Models.Servicio", b =>
@@ -338,7 +341,7 @@ namespace SistemaReservas.Migrations
 
                     b.HasIndex("NegocioId");
 
-                    b.ToTable("Servicios", (string)null);
+                    b.ToTable("Servicios");
                 });
 
             modelBuilder.Entity("SistemaReservas.Models.Usuario", b =>
@@ -369,7 +372,7 @@ namespace SistemaReservas.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Usuarios", (string)null);
+                    b.ToTable("Usuarios");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

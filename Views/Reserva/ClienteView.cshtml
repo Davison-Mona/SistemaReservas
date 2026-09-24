@@ -1,0 +1,75 @@
+@model SistemaReservas.Models.Negocio
+
+@{
+    ViewData["Title"] = "Agendar Cita en " + Model.Nombre;
+}
+
+<div class="container my-5" style="max-width: 600px;">
+    <div class="text-center mb-4">
+        <h2 class="fw-bold text-primary"><i class="bi bi-shop me-2"></i>@Model.Nombre</h2>
+        <p class="text-muted">Selecciona tu servicio y programa tu cita directamente</p>
+    </div>
+
+    <form asp-action="ConfirmarReserva" method="post">
+        <input type="hidden" name="negocioId" value="@Model.Id" />
+
+        <!-- 1. Servicios del Negocio -->
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-primary text-white fw-bold">
+                1. Elige un Servicio
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    @foreach (var s in Model.Servicios)
+                    {
+                        <label class="list-group-item d-flex justify-content-between align-items-center p-3">
+                            <div>
+                                <input class="form-check-input me-2" type="radio" name="servicioId" value="@s.Id" required />
+                                <span class="fw-bold text-dark">@s.Nombre</span>
+                            </div>
+                            <span class="badge bg-success fs-6">$@s.Precio.ToString("N0")</span>
+                        </label>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Fecha de Cita -->
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-primary text-white fw-bold">
+                2. Elige la Fecha
+            </div>
+            <div class="card-body">
+                <input type="date" id="fechaCita" name="fecha" class="form-control form-control-lg" 
+                       min="@DateTime.Now.ToString("yyyy-MM-dd")" required />
+                
+                @if (Model.DiasBloqueados.Any())
+                {
+                    <small class="text-danger d-block mt-2">
+                        * Algunas fechas pueden no estar disponibles debido a inhabilitaciones del establecimiento.
+                    </small>
+                }
+            </div>
+        </div>
+
+        <!-- 3. Datos del Cliente -->
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-primary text-white fw-bold">
+                3. Tus Datos de Contacto
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Nombre Completo</label>
+                    <input type="text" name="nombreCliente" class="form-control" required placeholder="Tu nombre" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Teléfono / WhatsApp</label>
+                    <input type="tel" name="telefonoCliente" class="form-control" required placeholder="300 000 0000" />
+                </div>
+                <button type="submit" class="btn btn-success w-100 btn-lg fw-bold">
+                    <i class="bi bi-calendar-check me-2"></i>Confirmar Reserva
+                </button>
+            </div>
+        </div>
+    </form>
+</div>

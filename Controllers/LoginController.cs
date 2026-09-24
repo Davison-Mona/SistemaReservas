@@ -36,8 +36,13 @@ namespace SistemaReservas.Controllers
                 return View("Index");
             }
 
-            // Redirigir al inicio del sistema tras autenticar
-            return RedirectToAction("Index", "Home");
+            // Redirección inteligente según el Rol del usuario
+            if (usuario.Rol == "Admin")
+            {
+                return RedirectToAction("Index", "Admin");
+            }
+
+            return RedirectToAction("Index", "MiNegocio");
         }
 
         // GET: Login/OlvideContrasena

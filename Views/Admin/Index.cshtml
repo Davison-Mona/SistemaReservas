@@ -1,0 +1,205 @@
+@model IEnumerable<SistemaReservas.Models.Negocio>
+
+@{
+    ViewData["Title"] = "Panel de Administración";
+}
+
+<div class="container my-4">
+    <!-- Encabezado con botón de acción -->
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+        <div>
+            <h2 class="fw-bold mb-0 text-dark">Control de Negocios</h2>
+            <small class="text-muted">Administra los establecimientos y crea los usuarios para sus dueños</small>
+        </div>
+        <!-- Botón para abrir el Modal de Crear -->
+        <button class="btn btn-success btn-lg shadow-sm font-weight-bold" data-bs-toggle="modal" data-bs-target="#modalCrearNegocio">
+            <i class="bi bi-plus-circle me-1"></i> + Añadir Nuevo Negocio
+        </button>
+    </div>
+
+    <!-- Mensajes de Alerta (Éxito / Error) -->
+    @if (TempData["Exito"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            <strong>¡Éxito!</strong> @TempData["Exito"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <strong>Error:</strong> @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Tarjetas con las métricas del ViewBag de tu controlador -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 border-start border-primary border-4 p-3">
+                <span class="text-muted small fw-bold">Total Negocios</span>
+                <h3 class="fw-bold mb-0 text-primary">@ViewBag.TotalNegocios</h3>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 border-start border-success border-4 p-3">
+                <span class="text-muted small fw-bold">Activos</span>
+                <h3 class="fw-bold mb-0 text-success">@ViewBag.Activos</h3>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 border-start border-danger border-4 p-3">
+                <span class="text-muted small fw-bold">Inactivos</span>
+                <h3 class="fw-bold mb-0 text-danger">@ViewBag.Inactivos</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla Dinámica -->
+    <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
+        <div class="card-body p-0">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th class="ps-4">Nombre del Negocio</th>
+                        <th>Teléfono</th>
+                        <th>Dirección</th>
+                        <th>Estado</th>
+                        <th class="text-center pe-4">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model == null || !Model.Any())
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted">
+                                <h5>No hay negocios registrados</h5>
+                                <p class="mb-0">Haz clic en <strong>+ Añadir Nuevo Negocio</strong> para empezar.</p>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var negocio in Model)
+                        {
+                            <tr>
+                                <td class="ps-4 fw-bold text-dark">@negocio.Nombre</td>
+                                <td>@(string.IsNullOrEmpty(negocio.Telefono) ? "Sin teléfono" : negocio.Telefono)</td>
+                                <td>@(string.IsNullOrEmpty(negocio.Direccion) ? "Sin dirección" : negocio.Direccion)</td>
+                                <td>
+                                    @if (negocio.Activo)
+                                    {
+                                        <span class="badge bg-success px-3 py-2">Activo</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary px-3 py-2">Inactivo</span>
+                                    }
+                                </td>
+                                <td class="text-center pe-4">
+                                    <!-- Botón Editar (Abre Modal de Edición) -->
+                                    <button type="button" class="btn btn-sm btn-outline-primary me-2 fw-bold" data-bs-toggle="modal" data-bs-target="#modalEditar-@negocio.Id">
+                                        Editar
+                                    </button>
+
+                                    <!-- Botón Habilitar / Deshabilitar -->
+                                    <form asp-action="CambiarEstado" method="post" class="d-inline">
+                                        <input type="hidden" name="id" value="@negocio.Id" />
+                                        @if (negocio.Activo)
+                                        {
+                                            <button type="submit" class="btn btn-sm btn-outline-danger fw-bold px-3">
+                                                Deshabilitar
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button type="submit" class="btn btn-sm btn-success fw-bold px-3">
+                                                Habilitar
+                                            </button>
+                                        }
+                                    </form>
+                                </td>
+                            </tr>
+
+                            <!-- Modal Emergente para Editar este Negocio -->
+                            <div class="modal fade" id="modalEditar-@negocio.Id" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content border-0 shadow">
+                                        <div class="modal-header bg-primary text-white">
+                                            <h5 class="modal-title fw-bold">Editar Negocio: @negocio.Nombre</h5>
+                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <form asp-action="Editar" method="post">
+                                            <input type="hidden" name="id" value="@negocio.Id" />
+                                            <div class="modal-body p-4 text-start">
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">Nombre del Negocio</label>
+                                                    <input type="text" name="nombre" class="form-control" value="@negocio.Nombre" required />
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">Teléfono</label>
+                                                    <input type="text" name="telefono" class="form-control" value="@negocio.Telefono" />
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">Dirección</label>
+                                                    <input type="text" name="direccion" class="form-control" value="@negocio.Direccion" />
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer bg-light">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                <button type="submit" class="btn btn-primary px-4 fw-bold">Guardar Cambios</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL EMERGENTE PARA CREAR NUEVO NEGOCIO Y USUARIO DUEÑO -->
+<div class="modal fade" id="modalCrearNegocio" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title fw-bold">Añadir Nuevo Negocio</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form asp-action="Crear" method="post">
+                <div class="modal-body p-4">
+                    <h6 class="text-success border-bottom pb-2 mb-3 fw-bold">1. Credenciales de Acceso para el Dueño</h6>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Correo Electrónico (Usuario) *</label>
+                        <input type="email" name="correo" class="form-control" placeholder="ejemplo@negocio.com" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Contraseña *</label>
+                        <input type="password" name="contrasena" class="form-control" placeholder="••••••••" required />
+                    </div>
+
+                    <h6 class="text-success border-bottom pb-2 mb-3 mt-4 fw-bold">2. Datos del Negocio</h6>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Nombre del Negocio *</label>
+                        <input type="text" name="nombre" class="form-control" placeholder="Ej: Peluquería Central" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Teléfono</label>
+                        <input type="text" name="telefono" class="form-control" placeholder="Ej: 3001234567" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Dirección</label>
+                        <input type="text" name="direccion" class="form-control" placeholder="Ej: Calle 10 # 20-30" />
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success px-4 fw-bold">Guardar y Activar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

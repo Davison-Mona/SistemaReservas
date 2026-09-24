@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SistemaReservas.Data;
 using Microsoft.AspNetCore.Identity;
-
+using SistemaReservas.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +22,8 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => {
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<SistemaReservas.Services.EmailService>();
+
+builder.Services.AddScoped<EmailService>();
 
 var app = builder.Build();
 
